@@ -45,23 +45,13 @@ Phy::Phy() :
 	digitalWrite(AZ_ZERO, HIGH);
 }
 
-void Phy::moveTo(float altD, float azD) {
-
-	if ( azD > 180){
+void Phy::setAltAz(float altD, float azD) {
+	if (azD > 180) {
 		azD = azD - 180;
 		altD = 90 + 90 - altD;
 	}
-
-
-	int alt = ALT_CIR * (altD / 360.0);
-	int az = AZ_CIR * (azD / 360.0);
-	Serial.println(alt);
-	setTarget(alt, az);
-}
-
-void Phy::setTarget(int alt, int az) {
-	alt_target = alt;
-	az_target = az;
+	alt_target = ALT_CIR * (altD / 360.0);
+	az_target = AZ_CIR * (azD / 360.0);
 }
 
 void Phy::tick() {
@@ -70,22 +60,14 @@ void Phy::tick() {
 		return;
 	}
 
-//	digitalWrite(PIN##_DIR, DIR); \
-//			digitalWrite(PIN##_STEP, HIGH); \
-//			delayMicroseconds(PIN##_DELAY); \
-//			digitalWrite(PIN##_STEP, LOW); \
-//			delayMicroseconds(PIN##_DELAY); \
-
 	if (alt_cur != alt_target) {
 		digitalWrite(ALT_DIR, alt_cur < alt_target ? 0 : 1);
 		digitalWrite(ALT_STEP, HIGH);
-		//STEP(ALT, alt_cur < alt_target ? 0 : 1)
 		alt_cur = alt_cur + (alt_cur < alt_target ? 1 : -1);
 	}
 	if (az_cur != az_target) {
 		digitalWrite(AZ_DIR, az_cur < az_target ? 0 : 1);
 		digitalWrite(AZ_STEP, HIGH);
-		//STEP(AZ, az_cur < az_target ? 0 : 1);
 		az_cur = az_cur + (az_cur < az_target ? 1 : -1);
 	}
 
@@ -93,17 +75,16 @@ void Phy::tick() {
 
 	digitalWrite(ALT_STEP, LOW);
 	digitalWrite(AZ_STEP, LOW);
-
 }
 
 void Phy::zero() {
-	Serial.println("Zeroing ALT...");
+	//Serial.println("Zeroing ALT...");
 	for (int i = 0; i < 1000; i++)
 		STEP(ALT, 0);
 	for (int i = 0; i < 2000 && !ZERO(ALT); i++)
 		STEP(ALT, 1);
 
-	Serial.println("Zero AZ...");
+	//Serial.println("Zero AZ...");
 	for (int i = 0; i < 500; i++)
 		STEP(AZ, 0);
 	for (int i = 0; i < 1000 && !ZERO(AZ); i++)
@@ -116,9 +97,10 @@ void Phy::zero() {
 		Serial.println("Zero AZ failed.");
 	}
 
-	if (!ZERO(ALT) || !ZERO(AZ))
+	if (!ZERO(ALT) || !ZERO(AZ)) {
 		while (true) {
 		}
+	}
 
-	Serial.println("Zero OK...");
+	//Serial.println("Zero OK...");
 }

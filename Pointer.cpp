@@ -123,7 +123,7 @@ void loop() {
 		uint32_t time = clock.getTime();
 		if (time != lastTime) {
 			as.convert(clock.getTime(), target_ra, target_dec, &alt, &az);
-			phy.moveTo(alt, az);
+			phy.setAltAz(alt, az);
 		}
 		lastTime = time;
 		phy.tick();

@@ -11,8 +11,7 @@ private:
 	int az_target;
 public:
 	Phy();
-	void moveTo(float altD, float azD);
-	void setTarget(int alt, int az);
+	void setAltAz(float altD, float azD);
 	void tick();
 	void zero();
 };
