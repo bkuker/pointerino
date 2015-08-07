@@ -7,12 +7,13 @@ class Phy {
 private:
 	int alt_cur;
 	int az_cur;
-	float alt_deg;
-	float az_deg;
+	int alt_target;
+	int az_target;
 public:
 	Phy();
 	void moveTo(float altD, float azD);
-	void stepTo(int alt, int az);
+	void setTarget(int alt, int az);
+	void tick();
 	void zero();
 };
 

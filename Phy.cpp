@@ -29,7 +29,7 @@
 #define AZ_MAX 3200
 
 Phy::Phy() :
-		alt_cur(0), az_cur(0) {
+		alt_cur(0), az_cur(0), alt_target(0), az_target(0) {
 	pinMode(ALT_DIR, OUTPUT);
 	pinMode(ALT_STEP, OUTPUT);
 	digitalWrite(ALT_STEP, LOW);
@@ -49,25 +49,29 @@ void Phy::moveTo(float altD, float azD) {
 	int alt = ALT_CIR * (altD / 360.0);
 	int az = AZ_CIR * (azD / 360.0);
 	Serial.println(alt);
-	stepTo(alt, az);
+	setTarget(alt, az);
 }
 
-void Phy::stepTo(int alt, int az) {
-	if (alt > ALT_MAX || alt < ALT_MIN || az > AZ_MAX || az < AZ_MIN) {
-		Serial.println("LIMIT, HALTED");
-		while (true) {
-		}
+void Phy::setTarget(int alt, int az) {
+	alt_target = alt;
+	az_target = az;
+}
+
+void Phy::tick() {
+	if (alt_cur > ALT_MAX || alt_cur < ALT_MIN || az_cur > AZ_MAX
+			|| az_cur < AZ_MIN) {
+		return;
 	}
-	while (alt_cur != alt || az_cur != az) {
-		if (alt_cur != alt) {
-			STEP(ALT, alt_cur < alt ? 0 : 1)
-			alt_cur = alt_cur + (alt_cur < alt ? 1 : -1);
-		}
-		if (az_cur != az) {
-			STEP(AZ, az_cur < az ? 0 : 1);
-			az_cur = az_cur + (az_cur < az ? 1 : -1);
-		}
+
+	if (alt_cur != alt_target) {
+		STEP(ALT, alt_cur < alt_target ? 0 : 1)
+		alt_cur = alt_cur + (alt_cur < alt_target ? 1 : -1);
 	}
+	if (az_cur != az_target) {
+		STEP(AZ, az_cur < az_target ? 0 : 1);
+		az_cur = az_cur + (az_cur < az_target ? 1 : -1);
+	}
+
 }
 
 void Phy::zero() {
