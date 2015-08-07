@@ -8,13 +8,15 @@ Clock clock = Clock();
 Phy phy = Phy();
 AstroClock as = AstroClock(43.554736, -73.249809);
 
+float target_ra = 0;
+float target_dec = 0;
+bool move = false;
+
 String go = "";         // a string to hold incoming data
 //r480642D7,F41BECFA
 //R34AB,12CE
 
 //r34AB0000,12CE0000
-
-
 
 void dms(float a) {
 	int d = floor(a);
@@ -29,14 +31,14 @@ void dms(float a) {
 }
 
 void goTo(String s) {
-	String ra = s.substring(0,4);
-	String dec = s.substring(9,13);
+	String ra = s.substring(0, 4);
+	String dec = s.substring(9, 13);
 //	Serial.print("RA=");
 //	Serial.println(ra);
 //	Serial.print("DEC=");
 //	Serial.println(dec);
-	long ral = strtol(ra.c_str(),NULL,16);
-	long decl = strtol(dec.c_str(),NULL,16);
+	long ral = strtol(ra.c_str(), NULL, 16);
+	long decl = strtol(dec.c_str(), NULL, 16);
 //	Serial.print("RAl=");
 //	Serial.println(ral);
 //	Serial.print("DECl=");
@@ -45,8 +47,8 @@ void goTo(String s) {
 	float raf;
 	float decf;
 
-	raf = ((float)ral / 65535.0) * 360;
-	decf = ((float)decl / 65535.0) * 360;
+	raf = ((float) ral / 65535.0) * 360;
+	decf = ((float) decl / 65535.0) * 360;
 
 //	Serial.print("RAf=");
 //	Serial.println(raf);
@@ -55,9 +57,9 @@ void goTo(String s) {
 //	Serial.println(decf);
 //	dms(decf);
 
-	float alt, az;
-	as.convert(clock.getTime(), raf,decf, &alt, &az);
-	phy.moveTo(alt,az);
+	target_ra = raf;
+	target_dec = decf;
+	move = true;
 //
 //	Serial.print(clock.getTime());
 //		Serial.print("\nALT,AZ: ");
@@ -104,6 +106,7 @@ void serialEvent() {
 void setup() {
 	Serial.begin(9600);
 	go.reserve(20);
+	go = "";
 
 	Wire.begin();
 	//clock.setTime(0, 41, 23, 1, 31, 5, 15);
@@ -112,39 +115,50 @@ void setup() {
 	phy.zero();
 }
 
+uint32_t lastTime = 0;
 void loop() {
-	phy.tick();
-	return;
+
 	float alt, az;
-	as.convert(clock.getTime(), 101.287, -16.716, &alt, &az);
-
-	Serial.print(clock.getTime());
-	Serial.print(" ");
-	dms(alt);
-	Serial.print(",");
-	dms(az);
-	Serial.println("");
-
-	delay(500);
+	if (move) {
+		uint32_t time = clock.getTime();
+		if (time != lastTime) {
+			as.convert(clock.getTime(), target_ra, target_dec, &alt, &az);
+			phy.moveTo(alt, az);
+		}
+		lastTime = time;
+		phy.tick();
+	}
 	return;
-
-	phy.zero();
-
-	for (int alt = 0; alt <= 180; alt += 45) {
-		phy.moveTo(alt, 0);
-		delay(300);
-	}
-	for (int alt = 180; alt >= 0; alt -= 10) {
-		phy.moveTo(alt, 0);
-		delay(100);
-	}
-
-	phy.moveTo(0, 45);
-	delay(1000);
-	phy.moveTo(0, -45);
-	delay(1000);
-	phy.moveTo(0, 0);
-
-	while (1) {
-	}
+//	float alt, az;
+//	as.convert(clock.getTime(), 101.287, -16.716, &alt, &az);
+//
+//	Serial.print(clock.getTime());
+//	Serial.print(" ");
+//	dms(alt);
+//	Serial.print(",");
+//	dms(az);
+//	Serial.println("");
+//
+//	delay(500);
+//	return;
+//
+//	phy.zero();
+//
+//	for (int alt = 0; alt <= 180; alt += 45) {
+//		phy.moveTo(alt, 0);
+//		delay(300);
+//	}
+//	for (int alt = 180; alt >= 0; alt -= 10) {
+//		phy.moveTo(alt, 0);
+//		delay(100);
+//	}
+//
+//	phy.moveTo(0, 45);
+//	delay(1000);
+//	phy.moveTo(0, -45);
+//	delay(1000);
+//	phy.moveTo(0, 0);
+//
+//	while (1) {
+//	}
 }

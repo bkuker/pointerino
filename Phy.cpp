@@ -46,6 +46,13 @@ Phy::Phy() :
 }
 
 void Phy::moveTo(float altD, float azD) {
+
+	if ( azD > 180){
+		azD = azD - 180;
+		altD = 90 + 90 - altD;
+	}
+
+
 	int alt = ALT_CIR * (altD / 360.0);
 	int az = AZ_CIR * (azD / 360.0);
 	Serial.println(alt);
@@ -63,14 +70,29 @@ void Phy::tick() {
 		return;
 	}
 
+//	digitalWrite(PIN##_DIR, DIR); \
+//			digitalWrite(PIN##_STEP, HIGH); \
+//			delayMicroseconds(PIN##_DELAY); \
+//			digitalWrite(PIN##_STEP, LOW); \
+//			delayMicroseconds(PIN##_DELAY); \
+
 	if (alt_cur != alt_target) {
-		STEP(ALT, alt_cur < alt_target ? 0 : 1)
+		digitalWrite(ALT_DIR, alt_cur < alt_target ? 0 : 1);
+		digitalWrite(ALT_STEP, HIGH);
+		//STEP(ALT, alt_cur < alt_target ? 0 : 1)
 		alt_cur = alt_cur + (alt_cur < alt_target ? 1 : -1);
 	}
 	if (az_cur != az_target) {
-		STEP(AZ, az_cur < az_target ? 0 : 1);
+		digitalWrite(AZ_DIR, az_cur < az_target ? 0 : 1);
+		digitalWrite(AZ_STEP, HIGH);
+		//STEP(AZ, az_cur < az_target ? 0 : 1);
 		az_cur = az_cur + (az_cur < az_target ? 1 : -1);
 	}
+
+	delayMicroseconds(500);
+
+	digitalWrite(ALT_STEP, LOW);
+	digitalWrite(AZ_STEP, LOW);
 
 }
 
