@@ -30,7 +30,30 @@ void dms(float a) {
 	Serial.print("\"");
 }
 
-void goTo(String s) {
+String raDecToNexstar(float ra, float dec){
+
+	long ral = ((ra / 360.0f) * 65535.0f);
+	long decl = ((dec / 360.0f) * 65535.0f);
+
+	String ras = String(ral, HEX);
+	String decs =  String(decl, HEX);
+
+	while ( ras.length() > 4 )
+		ras.remove(0,1);
+	while ( ras.length() < 4 )
+		ras = "0" + ras;
+
+	while(decs.length() > 4)
+		decs.remove(0,1);
+	while(decs.length() < 4)
+		decs = "0" + decs;
+
+	ras.toUpperCase();
+	decs.toUpperCase();
+	return ras + "0000," + decs + "0000";
+}
+
+void nexstarToRaDec(String s, float* raf, float* decf) {
 	String ra = s.substring(0, 4);
 	String dec = s.substring(9, 13);
 //	Serial.print("RA=");
@@ -44,11 +67,9 @@ void goTo(String s) {
 //	Serial.print("DECl=");
 //	Serial.println(decl);
 
-	float raf;
-	float decf;
 
-	raf = ((float) ral / 65535.0) * 360;
-	decf = ((float) decl / 65535.0) * 360;
+	*raf = ((float) ral / 65535.0) * 360;
+	*decf = ((float) decl / 65535.0) * 360;
 
 //	Serial.print("RAf=");
 //	Serial.println(raf);
@@ -57,9 +78,6 @@ void goTo(String s) {
 //	Serial.println(decf);
 //	dms(decf);
 
-	target_ra = raf;
-	target_dec = decf;
-	move = true;
 //
 //	Serial.print(clock.getTime());
 //		Serial.print("\nALT,AZ: ");
@@ -79,11 +97,13 @@ void process(char c) {
 			state = GOTO;
 			go = "";
 		} else if (c == 'e') {
-			if (go.length() == 17) {
-				Serial.print(go);
+//			if (go.length() == 17) {
+//				Serial.print(go);
+//				Serial.print("#");
+//			} else {
+				Serial.print(raDecToNexstar(target_ra, target_dec));
 				Serial.print("#");
-			} else
-				Serial.print("00000000,00000000#");
+//			}
 		}
 		return;
 	}
@@ -91,7 +111,14 @@ void process(char c) {
 		go += c;
 		if (go.length() == 17) {
 			Serial.print("#");
-			goTo(go);
+
+			float ra, dec;
+			nexstarToRaDec(go, &ra, &dec);
+
+			target_ra = ra;
+			target_dec = dec;
+			move = true;
+
 			state = WAITING;
 		}
 	}
@@ -112,12 +139,47 @@ void setup() {
 	//clock.setTime(0, 41, 23, 1, 31, 5, 15);
 	Serial.print("00000000,00000000#");
 
-	phy.zero();
+	//phy.zero();
 }
 
 uint32_t lastTime = 0;
 void loop() {
 
+#if 0
+	float alt, az, ra, dec;
+	ra=101.287;
+	dec=-16.716;
+
+	nexstarToRaDec("480642D7,F41BECFA", &ra, &dec);
+	nexstarToRaDec("F4AB0000,F2CE0000", &ra, &dec);
+	nexstarToRaDec("AFE50960,ED343393", &ra, &dec);
+
+	Serial.print("RaDec: ");
+	dms(ra);
+	Serial.print(",");
+	dms(dec);
+	Serial.println("");
+
+	as.convert(clock.getTime(), ra, dec, &alt, &az);
+	Serial.print("AltAz: ");
+	dms(alt);
+	Serial.print(",");
+	dms(az);
+	Serial.println("");
+
+	as.unconvert(clock.getTime(), alt,az,&ra,&dec);
+	Serial.print("RaDec: ");
+	dms(ra);
+	Serial.print(",");
+	dms(dec);
+	Serial.println("");
+
+	Serial.println(raDecToNexstar(ra,dec));
+
+	while(1){};
+#endif
+
+#if 1
 	float alt, az;
 	if (move) {
 		uint32_t time = clock.getTime();
@@ -129,6 +191,8 @@ void loop() {
 		phy.tick();
 	}
 	return;
+#endif
+
 //	float alt, az;
 //	as.convert(clock.getTime(), 101.287, -16.716, &alt, &az);
 //

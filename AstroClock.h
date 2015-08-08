@@ -22,6 +22,9 @@ public:
 
 	void convert(uint32_t timestamp, float ra, float dec, float* alt,
 			float* az);
+
+	void unconvert(uint32_t timestamp, float alt, float az, float* ra,
+			float* dec);
 };
 
 #endif /* ASTROCLOCK_H_ */

@@ -61,3 +61,44 @@ void AstroClock::convert(uint32_t timestamp, float ra, float dec, float* alt,
 	else
 		*az = 360.0 - a;
 }
+
+void AstroClock::unconvert(uint32_t timestamp, float alt, float az,
+		float* raOut, float* decOut) {
+
+	float d2r = PI / 180.0f;
+
+	float alt_r = alt * d2r;
+	float az_r = az * d2r;
+	float lat_r = lat * d2r;
+
+	//******************************************************************************
+	//find local HOUR ANGLE (in degrees, from 0. to 360.)
+	float ha = atan2(-sin(az_r) * cos(alt_r),
+			-cos(az_r) * sin(lat_r) * cos(alt_r) + sin(alt_r) * cos(lat_r));
+	ha = ha / d2r;
+
+	// w = where(ha LT 0.)
+	//if w[0] ne -1 then ha[w] = ha[w] + 360.
+	//ha = ha mod 360.
+	if (ha < 0) {
+		ha += 360;
+	}
+	while (ha >= 360)
+		ha = ha - 360;
+
+	//Find declination (positive if north of Celestial Equator, negative if south)
+	float sindec = sin(lat_r) * sin(alt_r)
+			+ cos(lat_r) * cos(alt_r) * cos(az_r);
+	float dec = asin(sindec) / d2r;	 // convert dec to degrees
+	while ( dec < 0 )
+		dec += 360;
+
+	float lstd = getLSTd(convertJ2000(timestamp));
+
+	*decOut = dec;
+	*raOut = lstd - ha;
+
+	while ( *raOut < 0 )
+		*raOut += 360;
+
+}
