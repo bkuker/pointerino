@@ -45,6 +45,21 @@ Phy::Phy() :
 	digitalWrite(AZ_ZERO, HIGH);
 }
 
+float Phy::getAlt() {
+	float ret = alt_cur * 360.0 / (float)ALT_CIR;
+	if ( ret > 90 )
+		ret = 180 - ret;
+	return ret;
+}
+
+float Phy::getAz() {
+	float alt = alt_cur * 360.0 / (float)ALT_CIR;
+	float ret = az_cur * 360.0 / (float)AZ_CIR;
+	if ( alt > 90 )
+		ret = ret + 180;
+	return ret;
+}
+
 void Phy::setAltAz(float altD, float azD) {
 	if (azD > 180) {
 		azD = azD - 180;
@@ -71,7 +86,7 @@ void Phy::tick() {
 		az_cur = az_cur + (az_cur < az_target ? 1 : -1);
 	}
 
-	delayMicroseconds(500);
+	delayMicroseconds(5000);
 
 	digitalWrite(ALT_STEP, LOW);
 	digitalWrite(AZ_STEP, LOW);

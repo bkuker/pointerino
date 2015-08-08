@@ -12,6 +12,8 @@ private:
 public:
 	Phy();
 	void setAltAz(float altD, float azD);
+	float getAlt();
+	float getAz();
 	void tick();
 	void zero();
 };

@@ -30,22 +30,22 @@ void dms(float a) {
 	Serial.print("\"");
 }
 
-String raDecToNexstar(float ra, float dec){
+String raDecToNexstar(float ra, float dec) {
 
 	long ral = ((ra / 360.0f) * 65535.0f);
 	long decl = ((dec / 360.0f) * 65535.0f);
 
 	String ras = String(ral, HEX);
-	String decs =  String(decl, HEX);
+	String decs = String(decl, HEX);
 
-	while ( ras.length() > 4 )
-		ras.remove(0,1);
-	while ( ras.length() < 4 )
+	while (ras.length() > 4)
+		ras.remove(0, 1);
+	while (ras.length() < 4)
 		ras = "0" + ras;
 
-	while(decs.length() > 4)
-		decs.remove(0,1);
-	while(decs.length() < 4)
+	while (decs.length() > 4)
+		decs.remove(0, 1);
+	while (decs.length() < 4)
 		decs = "0" + decs;
 
 	ras.toUpperCase();
@@ -66,7 +66,6 @@ void nexstarToRaDec(String s, float* raf, float* decf) {
 //	Serial.println(ral);
 //	Serial.print("DECl=");
 //	Serial.println(decl);
-
 
 	*raf = ((float) ral / 65535.0) * 360;
 	*decf = ((float) decl / 65535.0) * 360;
@@ -101,8 +100,10 @@ void process(char c) {
 //				Serial.print(go);
 //				Serial.print("#");
 //			} else {
-				Serial.print(raDecToNexstar(target_ra, target_dec));
-				Serial.print("#");
+			float ra, dec;
+			as.unconvert(clock.getTime(), phy.getAlt(), phy.getAz(), &ra, &dec);
+			Serial.print(raDecToNexstar(ra, dec));
+			Serial.print("#");
 //			}
 		}
 		return;
@@ -139,7 +140,7 @@ void setup() {
 	//clock.setTime(0, 41, 23, 1, 31, 5, 15);
 	Serial.print("00000000,00000000#");
 
-	//phy.zero();
+	phy.zero();
 }
 
 uint32_t lastTime = 0;
@@ -176,7 +177,7 @@ void loop() {
 
 	Serial.println(raDecToNexstar(ra,dec));
 
-	while(1){};
+	while(1) {};
 #endif
 
 #if 1
