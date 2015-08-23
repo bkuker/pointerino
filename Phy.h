@@ -16,6 +16,9 @@ public:
 	float getAz();
 	void tick();
 	void zero();
+
+	void azCalCircle();
+	void altCalCircle();
 };
 
 #endif

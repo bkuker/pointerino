@@ -29,7 +29,7 @@
 		<link>
 			<name>Libraries/Wire</name>
 			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Wire</locationURI>
+			<location>/home/bkuker/Desktop/Arduino/arduino-1.6.5/hardware/arduino/avr/libraries/Wire</location>
 		</link>
 		<link>
 			<name>arduino/core</name>
@@ -45,15 +45,15 @@
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
-			<value>file:/C:/Arduino/IDE/hardware/arduino/avr/libraries</value>
+			<value>file:/home/bkuker/Desktop/Arduino/arduino-1.6.5/hardware/arduino/avr/libraries</value>
 		</variable>
 		<variable>
 			<name>ArduinoPinPath</name>
-			<value>file:/C:/Arduino/IDE/hardware/arduino/avr/variants</value>
+			<value>file:/home/bkuker/Desktop/Arduino/arduino-1.6.5/hardware/arduino/avr/variants</value>
 		</variable>
 		<variable>
 			<name>ArduinoPlatformPath</name>
-			<value>file:/C:/Arduino/IDE/hardware/arduino/avr</value>
+			<value>file:/home/bkuker/Desktop/Arduino/arduino-1.6.5/hardware/arduino/avr</value>
 		</variable>
 	</variableList>
 </projectDescription>

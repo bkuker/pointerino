@@ -20,13 +20,14 @@
 
 #define ZERO(PIN) !digitalRead(PIN##_ZERO)
 
-#define ALT_MIN -3500
-#define ALT_CIR 7000
-#define ALT_MAX 3500
+#define ALT_CIR 7070
+#define ALT_MAX (ALT_CIR/2)
+#define ALT_MIN (-ALT_MAX)
 
-#define AZ_MIN -3200
-#define AZ_CIR 6400
-#define AZ_MAX 3200
+
+#define AZ_CIR 6405
+#define AZ_MAX (AZ_CIR/2)
+#define AZ_MIN (-AZ_MAX)
 
 Phy::Phy() :
 		alt_cur(0), az_cur(0), alt_target(0), az_target(0) {
@@ -86,10 +87,28 @@ void Phy::tick() {
 		az_cur = az_cur + (az_cur < az_target ? 1 : -1);
 	}
 
-	delayMicroseconds(5000);
+	delayMicroseconds(1000);
 
 	digitalWrite(ALT_STEP, LOW);
 	digitalWrite(AZ_STEP, LOW);
+}
+
+void Phy::azCalCircle(){
+	delay(3000);
+	for (int i = 0; i < AZ_CIR; i++)
+		STEP(AZ, 0);
+	delay(3000);
+	for (int i = 0; i < AZ_CIR; i++)
+		STEP(AZ, 1);
+}
+
+void Phy::altCalCircle(){
+	delay(3000);
+	for (int i = 0; i < ALT_CIR; i++)
+		STEP(ALT, 0);
+	delay(3000);
+	for (int i = 0; i < ALT_CIR; i++)
+		STEP(ALT, 1);
 }
 
 void Phy::zero() {

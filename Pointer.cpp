@@ -23,7 +23,7 @@ void dms(float a) {
 	int m = floor((a - d) * 60);
 	int s = floor((((a - d) * 60) - m) * 60);
 	Serial.print(d);
-	Serial.print("°");
+	Serial.print("ï¿½");
 	Serial.print(m);
 	Serial.print("'");
 	Serial.print(s);
@@ -139,12 +139,15 @@ void setup() {
 	Wire.begin();
 	//clock.setTime(0, 41, 23, 1, 31, 5, 15);
 	Serial.print("00000000,00000000#");
+	//clock.displayTime();
 
 	phy.zero();
 }
 
 uint32_t lastTime = 0;
 void loop() {
+	//phy.azCalCircle();
+	//while(1){}
 
 #if 0
 	float alt, az, ra, dec;
